@@ -3,12 +3,9 @@ package com.projectshift.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL10;
 import com.projectshift.Map;
 import com.projectshift.MapRenderer;
-import com.projectshift.OnscreenControlRenderer;
 
 /**
  * Author: Bogdanov Kirill

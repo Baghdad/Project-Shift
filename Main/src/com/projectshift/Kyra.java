@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Author: Bogdanov Kirill
@@ -14,21 +15,22 @@ public class Kyra {
     static final int IDLE = 0;
     static final int RUN = 1;
     static final int SPAWN = 2;
+    static final int SHIFT = 3;
+    static final int JUMP = 4;
     static final int RIGHT = 1;
     static final int LEFT = -1;
-    static final float ACCELERATION = 20f;
-    static final float GRAVITY = 20.0f;
-    static final float MAX_VEL = 6f;
-    static final float DAMP = 0.90f;
+    static final float MAX_VEL = 3.5f;
+    static final float JUMP_VELOCITY = 10;
 
     Vector2 pos = new Vector2();
-    Vector2 accel = new Vector2();
     Vector2 vel = new Vector2();
+    Vector2 accel = new Vector2();
+    Vector3 touchPoint = new Vector3();
     public Rectangle bounds = new Rectangle();
 
     int state = SPAWN;
     float stateTime = 0;
-    int dir = LEFT;
+    int dir = RIGHT;
     Map map;
     boolean grounded = false;
 
@@ -36,8 +38,8 @@ public class Kyra {
         this.map = map;
         pos.x = x;
         pos.y = y;
-        bounds.width = 0.6f;
-        bounds.height = 0.8f;
+        bounds.width = 1f;
+        bounds.height = 2f;
         bounds.x = pos.x + 0.2f;
         bounds.y = pos.y;
         state = SPAWN;
@@ -46,12 +48,9 @@ public class Kyra {
 
     public void update(float deltaTime) {
         processKeys();
-        accel.y = -GRAVITY;
+        accel.y = -10f;
         accel.mul(deltaTime);
         vel.add(accel.x, accel.y);
-        if (accel.x == 0) vel.x *= DAMP;
-        if (vel.x > MAX_VEL) vel.x = MAX_VEL;
-        if (vel.x < -MAX_VEL) vel.x = -MAX_VEL;
         vel.mul(deltaTime);
         tryMove();
         vel.mul(1.0f / deltaTime);
@@ -67,17 +66,30 @@ public class Kyra {
 
     public void processKeys() {
         if (state == SPAWN) return;
-        if (Gdx.input.isKeyPressed(Keys.D)) {
-            state = RUN;
+        if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && state != JUMP) {
+            state = SHIFT;
+            vel.x = 0;
+            if (Gdx.input.justTouched()) {
+                touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                MapRenderer.cam.unproject(touchPoint);
+                bounds.x = touchPoint.x;
+                bounds.y = touchPoint.y;
+            }
+        } else if (Gdx.input.isKeyPressed(Keys.W) && state != JUMP) {
+            state = JUMP;
+            vel.y = JUMP_VELOCITY;
+            grounded = false;
+        } else if (Gdx.input.isKeyPressed(Keys.D) && state != SHIFT) {
+            if (state != JUMP) state = RUN;
             dir = RIGHT;
-            accel.x = ACCELERATION * dir;
-        } else if (Gdx.input.isKeyPressed(Keys.A)) {
-            state = RUN;
+            vel.x = MAX_VEL * dir;
+        } else if (Gdx.input.isKeyPressed(Keys.A) && state != SHIFT) {
+            if (state != JUMP) state = RUN;
             dir = LEFT;
-            accel.x = ACCELERATION * dir;
+            vel.x = MAX_VEL * dir;
         } else {
-            state = IDLE;
-            accel.x = 0;
+            if (state != JUMP) state = IDLE;
+            vel.x = 0;
         }
     }
 
@@ -103,7 +115,7 @@ public class Kyra {
                 if (vel.y < 0) {
                     bounds.y = rect.y + rect.height + 0.01f;
                     grounded = true;
-                    if (state != SPAWN) state = Math.abs(accel.x) > 0.1f ? RUN : IDLE;
+                    if (state != SPAWN) state = Math.abs(vel.x) > 0.05f ? RUN : IDLE;
                 } else
                     bounds.y = rect.y - bounds.height - 0.01f;
                 vel.y = 0;
