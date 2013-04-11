@@ -48,7 +48,9 @@ public class Kyra {
 
     public void update(float deltaTime) {
         processKeys();
-        accel.y = -10f;
+        if (state != SHIFT) {
+            accel.y = -10f;
+        }
         accel.mul(deltaTime);
         vel.add(accel.x, accel.y);
         vel.mul(deltaTime);
@@ -93,12 +95,23 @@ public class Kyra {
         }
     }
 
-    Rectangle[] r = {new Rectangle(), new Rectangle(), new Rectangle(), new Rectangle(), new Rectangle()};
+    Rectangle[] r = {new Rectangle(), new Rectangle(), new Rectangle(), new Rectangle()};
+    Rectangle[] sideRects = {new Rectangle(), new Rectangle()};
 
     private void tryMove() {
         bounds.x += vel.x;
         fetchCollidableRects();
         for (Rectangle rect : r) {
+            if (bounds.overlaps(rect)) {
+                if (vel.x < 0)
+                    bounds.x = rect.x + rect.width + 0.01f;
+                else
+                    bounds.x = rect.x - bounds.width - 0.01f;
+                vel.x = 0;
+            }
+        }
+
+        for (Rectangle rect : sideRects) {
             if (bounds.overlaps(rect)) {
                 if (vel.x < 0)
                     bounds.x = rect.x + rect.width + 0.01f;
@@ -135,12 +148,18 @@ public class Kyra {
         int p3y = (int) (bounds.y + bounds.height);
         int p4x = (int) bounds.x;
         int p4y = (int) (bounds.y + bounds.height);
+        int p5x = (int) bounds.x;
+        int p5y = (int) (bounds.y + bounds.height / 2);
+        int p6x = (int) (bounds.x + bounds.width);
+        int p6y = (int) (bounds.y + bounds.height / 2);
 
         int[][] tiles = map.tiles;
         int tile1 = tiles[p1x][map.tiles[0].length - 1 - p1y];
         int tile2 = tiles[p2x][map.tiles[0].length - 1 - p2y];
         int tile3 = tiles[p3x][map.tiles[0].length - 1 - p3y];
         int tile4 = tiles[p4x][map.tiles[0].length - 1 - p4y];
+        int tile5 = tiles[p5x][map.tiles[0].length - 1 - p5y];
+        int tile6 = tiles[p6x][map.tiles[0].length - 1 - p6y];
 
         if (tile1 == Map.TILE)
             r[0].set(p1x, p1y, 1, 1);
@@ -158,7 +177,13 @@ public class Kyra {
             r[3].set(p4x, p4y, 1, 1);
         else
             r[3].set(-1, -1, 0, 0);
-
-        r[4].set(-1, -1, 0, 0);
+        if (tile5 == Map.TILE)
+            sideRects[0].set(p5x, p5y, 1, 1);
+        else
+            sideRects[0].set(-1, -1, 0, 0);
+        if (tile6 == Map.TILE)
+            sideRects[1].set(p6x, p6y, 1, 1);
+        else
+            sideRects[1].set(-1, -1, 0, 0);
     }
 }
