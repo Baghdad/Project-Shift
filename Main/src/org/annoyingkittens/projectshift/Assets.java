@@ -21,9 +21,15 @@ public class Assets {
     public static Animation kyraRightJump;
     public static Animation kyraLeftFall;
     public static Animation kyraRightFall;
+    public static Animation kyraLeftDroop;
+    public static Animation kyraRightDroop;
+    public static Animation kyraLeftClimb;
+    public static Animation kyraRightClimb;
+
     public static Texture kyraRunTexture;
     public static Texture kyraJumpTexture;
     public static Texture kyraFallTexture;
+    public static Texture kyraClimbTexture;
 
     public static Texture items;
     public static TextureRegion soundOn;
@@ -37,6 +43,8 @@ public class Assets {
     public static TextureRegion[] leftJumpRegion;
     public static TextureRegion[] rightFallRegion;
     public static TextureRegion[] leftFallRegion;
+    public static TextureRegion[] rightClimbRegion;
+    public static TextureRegion[] leftClimbRegion;
     public static Music shiftMusic;
 
     public static boolean soundEnabled = false;
@@ -54,6 +62,7 @@ public class Assets {
         kyraRunTexture = loadTexture("data/kyra_run.png");
         kyraJumpTexture = loadTexture("data/kyra_jump.png");
         kyraFallTexture = loadTexture("data/kyra_fall.png");
+        kyraClimbTexture = loadTexture("data/kyra_climb.png");
         rightRunRegion = new TextureRegion(kyraRunTexture).split(300, 360);
         leftRunRegion = new TextureRegion(kyraRunTexture).split(300, 360);
         rightIdleRegion = new TextureRegion(kyraRunTexture).split(57, 360)[0];
@@ -62,20 +71,28 @@ public class Assets {
         leftJumpRegion = new TextureRegion(kyraJumpTexture).split(121, 184)[0];
         rightFallRegion = new TextureRegion(kyraFallTexture).split(81, 140)[0];
         leftFallRegion = new TextureRegion(kyraFallTexture).split(81, 140)[0];
+        rightClimbRegion = new TextureRegion(kyraClimbTexture).split(60, 184)[0];
+        leftClimbRegion = new TextureRegion(kyraClimbTexture).split(60, 184)[0];
         TextureRegion[] rightRun = new TextureRegion[30];
         TextureRegion[] leftRun = new TextureRegion[30];
         TextureRegion[] rightJump = new TextureRegion[9];
         TextureRegion[] leftJump = new TextureRegion[9];
         TextureRegion[] rightFall = new TextureRegion[4];
         TextureRegion[] leftFall = new TextureRegion[4];
+        TextureRegion[] rightClimb = new TextureRegion[28];
+        TextureRegion[] leftClimb = new TextureRegion[28];
         int count = 0;
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 28; i++) {
             if (i < 4) {
                 rightFall[i] = rightFallRegion[i];
                 leftFall[i] = leftFallRegion[i];
             }
-            rightJump[i] = rightJumpRegion[i];
-            leftJump[i] = leftJumpRegion[i];
+            if (i < 9) {
+                rightJump[i] = rightJumpRegion[i];
+                leftJump[i] = leftJumpRegion[i];
+            }
+            rightClimb[i] = rightClimbRegion[i];
+            leftClimb[i] = leftClimbRegion[i];
         }
         for (int i = 1; i < 4; i++) {
             for (int j = 0; j < 10; j++) {
@@ -90,6 +107,9 @@ public class Assets {
         for (TextureRegion region : leftFall) {
             region.flip(true, false);
         }
+        for (TextureRegion region : leftClimb) {
+            region.flip(true, false);
+        }
         leftIdleRegion[0].flip(true, false);
         TextureRegion leftIdle = leftIdleRegion[0];
         TextureRegion rightIdle = rightIdleRegion[0];
@@ -101,8 +121,11 @@ public class Assets {
         kyraLeftJump = new Animation(0.1f, leftJump);
         kyraRightFall = new Animation(0.2f, rightFall);
         kyraLeftFall = new Animation(0.2f, leftFall);
+        kyraRightDroop = new Animation(0.5f, rightJump[8]);
+        kyraLeftDroop = new Animation(0.5f, leftJump[8]);
+        kyraRightClimb = new Animation(0.1f, rightClimb);
+        kyraLeftClimb = new Animation(0.1f, leftClimb);
         shiftMusic = Gdx.audio.newMusic(Gdx.files.internal("data/music/Dev_Environment.mp3"));
         shiftMusic.setLooping(true);
-        shiftMusic.play();
     }
 }

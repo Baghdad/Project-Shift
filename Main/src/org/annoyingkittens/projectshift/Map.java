@@ -11,12 +11,13 @@ import com.badlogic.gdx.math.Vector3;
  * Time: 19:35
  */
 public class Map {
-    static int TILE = 0xffffff;
+    public static int TILE = 0xffffff;
+    static int LEDGE = 0x0000ff;
     static int START = 0xff0000;
     static int ENEMY = 0x00ff00;
 
-    int tiles[][];
-    public Kyra kyra;
+    private int tiles[][];
+    private Kyra kyra;
     Vector3 touchPoint = new Vector3();
     Rectangle soundBounds;
 
@@ -33,7 +34,6 @@ public class Map {
                 if (match(START, pix)) {
                     kyra = new Kyra(this, x, pixmap.getHeight() - 1 - y);
                     kyra.state = States.SPAWN;
-
                 } else if (match(ENEMY, pix)) {
 
                 } else {
@@ -61,7 +61,15 @@ public class Map {
         kyra.update(deltaTime);
     }
 
-    boolean match(int src, int dst) {
+    public static boolean match(int src, int dst) {
         return src == dst;
+    }
+
+    public int[][] getTiles() {
+        return tiles;
+    }
+
+    public Kyra getKyra() {
+        return kyra;
     }
 }
