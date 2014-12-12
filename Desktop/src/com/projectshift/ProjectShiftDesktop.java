@@ -3,7 +3,7 @@ package com.projectshift;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import org.annoyingkittens.projectshift.ProjectShift;
 
 /**
  * Author: Bogdanov Kirill
@@ -12,7 +12,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
  */
 public class ProjectShiftDesktop {
     public static void main(String[] args) {
-        new LwjglApplication(new ProjectShift(), "Project SHIFT", 480, 320, true);
+        new LwjglApplication(new ProjectShift(), "Project SHIFT", 720, 480);
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
     }
 }

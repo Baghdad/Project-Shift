@@ -3,7 +3,7 @@ package org.annoyingkittens.projectshift;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
+//import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
@@ -13,7 +13,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  */
 public class Assets {
     public static TextureRegion tile;
-    public static Animation kyraLeftRun;
+    public static TextureRegion kyraRight;
+    public static TextureRegion kyraLeft;
+    /*public static Animation kyraLeftRun;
     public static Animation kyraRightRun;
     public static Animation kyraIdleLeft;
     public static Animation kyraIdleRight;
@@ -29,13 +31,13 @@ public class Assets {
     public static Texture kyraRunTexture;
     public static Texture kyraJumpTexture;
     public static Texture kyraFallTexture;
-    public static Texture kyraClimbTexture;
+    public static Texture kyraClimbTexture;*/
 
     public static Texture items;
     public static TextureRegion soundOn;
     public static TextureRegion soundOff;
 
-    public static TextureRegion[][] rightRunRegion;
+    /*public static TextureRegion[][] rightRunRegion;
     public static TextureRegion[][] leftRunRegion;
     public static TextureRegion[] rightIdleRegion;
     public static TextureRegion[] leftIdleRegion;
@@ -44,7 +46,7 @@ public class Assets {
     public static TextureRegion[] rightFallRegion;
     public static TextureRegion[] leftFallRegion;
     public static TextureRegion[] rightClimbRegion;
-    public static TextureRegion[] leftClimbRegion;
+    public static TextureRegion[] leftClimbRegion;*/
     public static Music shiftMusic;
 
     public static boolean soundEnabled = false;
@@ -59,7 +61,10 @@ public class Assets {
         soundOff = new TextureRegion(items, 0, 0, 64, 64);
         soundOn = new TextureRegion(items, 64, 0, 64, 64);
 
-        kyraRunTexture = loadTexture("data/kyra_run.png");
+        kyraRight = new TextureRegion(loadTexture("data/kyra_abs.png"));
+        kyraLeft = new TextureRegion(loadTexture("data/kyra_abs.png"));
+        kyraLeft.flip(true, false);
+        /*kyraRunTexture = loadTexture("data/kyra_run.png");
         kyraJumpTexture = loadTexture("data/kyra_jump.png");
         kyraFallTexture = loadTexture("data/kyra_fall.png");
         kyraClimbTexture = loadTexture("data/kyra_climb.png");
@@ -124,7 +129,7 @@ public class Assets {
         kyraRightDroop = new Animation(0.5f, rightJump[8]);
         kyraLeftDroop = new Animation(0.5f, leftJump[8]);
         kyraRightClimb = new Animation(0.1f, rightClimb);
-        kyraLeftClimb = new Animation(0.1f, leftClimb);
+        kyraLeftClimb = new Animation(0.1f, leftClimb);*/
         shiftMusic = Gdx.audio.newMusic(Gdx.files.internal("data/music/Dev_Environment.mp3"));
         shiftMusic.setLooping(true);
     }

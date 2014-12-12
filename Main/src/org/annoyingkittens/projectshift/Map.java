@@ -12,7 +12,8 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class Map {
     public static int TILE = 0xffffff;
-    static int LEDGE = 0x0000ff;
+    static int LEDGEL = 0x0000ff;
+    static int LEDGER = 0x000100;
     static int START = 0xff0000;
     static int ENEMY = 0x00ff00;
 
@@ -26,6 +27,7 @@ public class Map {
     }
 
     private void loadBinary() {
+        Gdx.app.debug("Shift", 0x000100 + "");
         Pixmap pixmap = new Pixmap(Gdx.files.internal("data/map.png"));
         tiles = new int[pixmap.getWidth()][pixmap.getHeight()];
         for (int y = 0; y < 35; y++) {
@@ -36,6 +38,8 @@ public class Map {
                     kyra.state = States.SPAWN;
                 } else if (match(ENEMY, pix)) {
 
+                } else if (match(LEDGEL, pix) && match(TILE, tiles[x - 1][y])) {
+                    tiles[x][y] = pix + 1;
                 } else {
                     tiles[x][y] = pix;
                 }
@@ -48,7 +52,8 @@ public class Map {
 
     public void update(float deltaTime) {
         if (Gdx.input.justTouched()) {
-            MapRenderer.cam.unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
+            touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            MapRenderer.cam.unproject(touchPoint);
             soundBounds = new Rectangle(MapRenderer.cam.position.x + 6, MapRenderer.cam.position.y + 4, 1, 1);
             if (OverlapTester.pointInRectangle(soundBounds, touchPoint.x, touchPoint.y)) {
             				Assets.soundEnabled = !Assets.soundEnabled;

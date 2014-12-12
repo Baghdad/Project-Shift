@@ -1,12 +1,15 @@
 package org.annoyingkittens.projectshift;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Animation;
+//import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteCache;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -19,7 +22,8 @@ public class MapRenderer {
     Kyra kyra;
     public static OrthographicCamera cam;
     SpriteCache cache;
-    SpriteBatch batch = new SpriteBatch(10000);
+    SpriteBatch batch = new SpriteBatch(5000);
+    ShapeRenderer shapeRenderer = new ShapeRenderer();
     int[][] blocks;
     FPSLogger fps = new FPSLogger();
     private final static int VIEWPORT_WIDTH = 18;
@@ -47,7 +51,8 @@ public class MapRenderer {
                         if (x > width) continue;
                         if (y > height) continue;
                         int posY = height - y - 1;
-                        if (Map.match(tiles[x][y], Map.TILE) || Map.match(tiles[x][y], Map.LEDGE))
+                        if (Map.match(tiles[x][y], Map.TILE) || Map.match(tiles[x][y], Map.LEDGEL) ||
+                                Map.match(tiles[x][y], Map.LEDGER))
                             cache.add(Assets.tile, x, posY, 1, 1);
                     }
                 }
@@ -61,10 +66,11 @@ public class MapRenderer {
     Vector3 lerpTarget = new Vector3();
 
     public void render(float deltaTime) {
+        Gdx.gl.glClearColor(1, 0.7f, 0.4f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         cam.position.lerp(lerpTarget.set(kyra.getPosition().x, kyra.getPosition().y, 0), 2f * deltaTime);
         cam.update();
         cache.setProjectionMatrix(cam.combined);
-        Gdx.gl.glDisable(GL10.GL_BLEND);
         cache.begin();
         for (int blockY = 0; blockY < 4; blockY++) {
             for (int blockX = 0; blockX < 6; blockX++) {
@@ -77,12 +83,18 @@ public class MapRenderer {
         batch.begin();
         renderKyra();
         batch.draw(Assets.soundEnabled ? Assets.soundOn : Assets.soundOff, cam.position.x + 6, cam.position.y + 4, 1, 1);
+        if (kyra.state == States.SHIFT) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(0, 0, 1, 0.2f);
+            shapeRenderer.rect(0, 0, 720, 480);
+            shapeRenderer.end();
+        }
         batch.end();
         fps.log();
     }
 
     private void renderKyra() {
-        Animation anim;
+        /*Animation anim;
         boolean loop = true;
         if (kyra.state == States.RUN) {
             if (kyra.dir == Kyra.LEFT) {
@@ -130,7 +142,14 @@ public class MapRenderer {
             else
                 anim = Assets.kyraRightClimb;
             batch.draw(anim.getKeyFrame(kyra.stateTime, loop), kyra.getPosition().x, kyra.getPosition().y, 0.82f, 2.5f);
+        }*/
+        TextureRegion texture;
+        if (kyra.dir == Kyra.LEFT) {
+            texture = Assets.kyraLeft;
+        } else {
+            texture = Assets.kyraRight;
         }
+        batch.draw(texture, kyra.getPosition().x, kyra.getPosition().y, 1f, 2f);
     }
 
     public void dispose() {

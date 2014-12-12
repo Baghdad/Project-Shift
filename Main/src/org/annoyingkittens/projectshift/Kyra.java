@@ -43,7 +43,7 @@ public class Kyra {
         pos.y = y;
         bounds.width = 1f;
         bounds.height = 2f;
-        bounds.x = pos.x + 0.2f;
+        bounds.x = pos.x + 0.5f;
         bounds.y = pos.y;
         state = States.SPAWN;
         stateTime = 0;
@@ -59,7 +59,7 @@ public class Kyra {
         }
         //манипуляции при прыжке номер раз
         if (state == States.JUMP) {
-            if (stateTime > 0.6 && !jumpCheck) {
+            if (!jumpCheck) {
                 vel.y = JUMP_VELOCITY;
                 jumpCheck = true;
             }
@@ -68,44 +68,25 @@ public class Kyra {
             sideCollideCheck = 0;
         }
         if (state == States.CLIMB) {
-            if (stateTime < 1.3f) {
-                if (dir == RIGHT) {
-                    vel.x = 0.1f;
-                } else {
-                    vel.x = -0.1f;
-                }
-                vel.y = 1.35f;
-            }
-            if (stateTime > 1.3f && stateTime < 1.7f) {
+            if (stateTime < 2.01) {
                 vel.x = 0;
-                vel.y = 1.7f;
+                vel.y = 1;
             }
-            if (stateTime > 1.7f && stateTime < 2.5f) {
-                if (dir == RIGHT) {
-                    vel.x = 0.6f;
-                } else {
-                    vel.x = -0.6f;
-                }
-                if (stateTime > 2.0f) {
-                    vel.y = 0.1f;
-                } else {
-                    vel.y = 0;
-                }
-            }
-            if (stateTime > 2.5f) {
+            if (stateTime >= 2.01 && stateTime < 3) {
                 vel.y = 0;
+                vel.x = dir == Kyra.RIGHT ? 1 : -1;
             }
-            if (stateTime > 2.8f) {
+            if (stateTime >= 3) {
                 vel.x = 0;
                 state = States.IDLE;
             }
         }
         //изменения скорости/ускорения от времени
-        accel.mul(deltaTime);
+        accel.scl(deltaTime);
         vel.add(accel.x, accel.y);
-        vel.mul(deltaTime);
+        vel.scl(deltaTime);
         tryMove();
-        vel.mul(1.0f / deltaTime);
+        vel.scl(1.0f / deltaTime);
         //проверка, что уже возродились (кандидат на выпил)
         if (state == States.SPAWN) {
             if (stateTime > 0.4f) {
@@ -115,7 +96,6 @@ public class Kyra {
         //приращение времени состояния
         stateTime += deltaTime;
         droopTime += deltaTime;
-        Gdx.app.debug("Shift", "Jump " + jumpCheck);
     }
 
     //метод задает реакцию на нажатие кнопок
@@ -135,11 +115,10 @@ public class Kyra {
                     bounds.y = touchPoint.y;
                 }
             }
-        } else if (Gdx.input.isKeyPressed(Keys.W) && state != States.JUMP && state != States.FALL &&
+        } else if (Gdx.input.isKeyJustPressed(Keys.W) && state != States.JUMP && state != States.FALL &&
                 state != States.CLIMB) {
             stateTime = 0;
             if (state == States.DROOP) {
-                bounds.x += 0.4f;
                 state = States.CLIMB;
                 jumpCheck = false;
             } else {
@@ -194,26 +173,26 @@ public class Kyra {
                 } else {
                     if (state != States.JUMP && state != States.FALL)
                         sideCollideCheck = 1;
-                    bounds.x = rect.x - bounds.width - 0.01f;
+                    bounds.x = rect.x - rect.width - 0.01f;
                 }
                 vel.x = 0;
             }
         }
 
-        for (Rectangle rect : ledgeRects) {
-            if (bounds.overlaps(rect) && droopTime > 0.3f && state != States.CLIMB) {
-                Gdx.app.debug("Shift", "tile " + rect.getX());
-                if (dir < 0 && tiles[(int) rect.getX() + 1][tiles[0].length - 1 - (int) rect.getY()] != Map.TILE) {
-                    bounds.x = rect.x + rect.width - 0.4f;
-                    state = States.DROOP;
-                    vel.x = 0;
-                }
-                if (dir > 0 && tiles[(int) rect.getX() - 1][tiles[0].length - 1 - (int) rect.getY()] != Map.TILE) {
-                    bounds.x = rect.x - rect.width + 0.1f;
-                    state = States.DROOP;
-                    vel.x = 0;
-                }
-            }
+        if (bounds.overlaps(ledgeRects[0]) && droopTime > 0.5f && state != States.CLIMB && dir == RIGHT) {
+            bounds.x = ledgeRects[0].x - 0.01f;
+            bounds.y = ledgeRects[0].y - 0.01f;
+            state = States.DROOP;
+            vel.x = 0;
+            vel.y = 0;
+        }
+
+        if (bounds.overlaps(ledgeRects[1]) && droopTime > 0.5f && state != States.CLIMB && dir == LEFT) {
+            bounds.x = ledgeRects[1].x + 0.01f;
+            bounds.y = ledgeRects[1].y - 0.01f;
+            state = States.DROOP;
+            vel.x = 0;
+            vel.y = 0;
         }
     }
 
@@ -239,22 +218,23 @@ public class Kyra {
             }
         }
 
-        for (Rectangle rect : ledgeRects) {
-            if (bounds.overlaps(rect) && droopTime > 0.3f && state != States.CLIMB) {
-                if ((dir < 0 && tiles[(int) rect.getX() + 1][tiles[0].length - 1 - (int) rect.getY()] != Map.TILE)
-                        || (dir > 0 && tiles[(int) rect.getX() - 1][tiles[0].length - 1 - (int) rect.getY()] != Map.TILE)) {
-                    bounds.y = rect.y - bounds.height + 0.5f;
-                    state = States.DROOP;
-                    vel.y = 0;
-                }
-            }
+        if (bounds.overlaps(ledgeRects[0]) && droopTime > 0.5f && state != States.CLIMB && dir == RIGHT) {
+            bounds.y = ledgeRects[0].y - 0.01f;
+            state = States.DROOP;
+            vel.y = 0;
         }
-        Gdx.app.debug("Shift", "velY2 " + vel.y);
+
+        if (bounds.overlaps(ledgeRects[1]) && droopTime > 0.5f && state != States.CLIMB && dir == LEFT) {
+            bounds.y = ledgeRects[1].y - 0.01f;
+            state = States.DROOP;
+            vel.y = 0;
+        }
+
         if (vel.y < -0.01 && state != States.JUMP) {
             state = States.FALL;
         }
 
-        pos.x = bounds.x - 0.2f;
+        pos.x = bounds.x;
         pos.y = bounds.y;
     }
 
@@ -280,11 +260,11 @@ public class Kyra {
         int tile5 = tiles[p5x][tiles[0].length - 1 - p5y];
         int tile6 = tiles[p6x][tiles[0].length - 1 - p6y];
 
-        if (tile1 == Map.TILE || tile1 == Map.LEDGE)
+        if (tile1 == Map.TILE || tile1 == Map.LEDGEL || tile1 == Map.LEDGER)
             allRects[0].set(p1x, p1y, 1, 1);
         else
             allRects[0].set(-1, -1, 0, 0);
-        if (tile2 == Map.TILE || tile2 == Map.LEDGE)
+        if (tile2 == Map.TILE || tile2 == Map.LEDGEL || tile2 == Map.LEDGER)
             allRects[1].set(p2x, p2y, 1, 1);
         else
             allRects[1].set(-1, -1, 0, 0);
@@ -304,12 +284,12 @@ public class Kyra {
             allRects[5].set(p6x, p6y, 1, 1);
         else
             allRects[5].set(-1, -1, 0, 0);
-        if (tile3 == Map.LEDGE)
-            ledgeRects[0].set(p3x, p3y, 1, 1);
+        if (tile3 == Map.LEDGEL)
+            ledgeRects[0].set(p5x, p5y, 1, 1);
         else
             ledgeRects[0].set(-1, -1, 0, 0);
-        if (tile4 == Map.LEDGE)
-            ledgeRects[1].set(p4x, p4y, 1, 1);
+        if (tile4 == Map.LEDGER)
+            ledgeRects[1].set(p6x, p6y, 1, 1);
         else
             ledgeRects[1].set(-1, -1, 0, 0);
     }
