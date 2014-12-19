@@ -1,7 +1,6 @@
 package org.annoyingkittens.projectshift;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -89,6 +88,14 @@ public class MapRenderer {
             shapeRenderer.rect(0, 0, 720, 480);
             shapeRenderer.end();
         }
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 1, 1);
+        shapeRenderer.rect(10, 10, kyra.shiftPoints / 3f, 5);
+        shapeRenderer.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1, 0, 0, 1);
+        shapeRenderer.rect(10, 20, kyra.healthPoints, 5);
+        shapeRenderer.end();
         batch.end();
         fps.log();
     }
@@ -149,7 +156,7 @@ public class MapRenderer {
         } else {
             texture = Assets.kyraRight;
         }
-        batch.draw(texture, kyra.getPosition().x, kyra.getPosition().y, 1f, 2f);
+        batch.draw(texture, kyra.getPosition().x, kyra.getPosition().y, kyra.bounds.width, kyra.bounds.height);
     }
 
     public void dispose() {
