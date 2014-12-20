@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Vector3;
 public class MapRenderer {
     int[][] tiles;
     Kyra kyra;
+    Turret turret;
     public static OrthographicCamera cam;
     SpriteCache cache;
     SpriteBatch batch = new SpriteBatch(5000);
@@ -31,6 +32,7 @@ public class MapRenderer {
     public MapRenderer(Map map) {
         tiles = map.getTiles();
         kyra = map.getKyra();
+        turret = map.getTurret();
         cam = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         cam.position.set(kyra.getPosition().x, kyra.getPosition().y, 0);
         this.cache = new SpriteCache(tiles.length * tiles[0].length, false);
@@ -81,13 +83,13 @@ public class MapRenderer {
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
         renderKyra();
-        batch.draw(Assets.soundEnabled ? Assets.soundOn : Assets.soundOff, cam.position.x + 6, cam.position.y + 4, 1, 1);
+        renderTurret();
+        renderUI();
         if (kyra.state == States.SHIFT) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(0, 0, 1, 0.2f);
-            shapeRenderer.rect(0, 0, 720, 480);
-            shapeRenderer.end();
+            batch.draw(Assets.filter, cam.position.x - VIEWPORT_WIDTH / 2, cam.position.y - VIEWPORT_HEIGHT / 2,
+                    VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         }
+        batch.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 0, 1, 1);
         shapeRenderer.rect(10, 10, kyra.shiftPoints / 3f, 5);
@@ -96,7 +98,6 @@ public class MapRenderer {
         shapeRenderer.setColor(1, 0, 0, 1);
         shapeRenderer.rect(10, 20, kyra.healthPoints, 5);
         shapeRenderer.end();
-        batch.end();
         fps.log();
     }
 
@@ -157,6 +158,14 @@ public class MapRenderer {
             texture = Assets.kyraRight;
         }
         batch.draw(texture, kyra.getPosition().x, kyra.getPosition().y, kyra.bounds.width, kyra.bounds.height);
+    }
+
+    private void renderTurret() {
+        batch.draw(Assets.turret, turret.pos.x, turret.pos.y, turret.bounds.width, turret.bounds.height);
+    }
+
+    private void renderUI() {
+        batch.draw(Assets.soundEnabled ? Assets.soundOn : Assets.soundOff, cam.position.x + 6, cam.position.y + 4, 1, 1);
     }
 
     public void dispose() {

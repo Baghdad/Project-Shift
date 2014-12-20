@@ -19,6 +19,7 @@ public class Map {
 
     private int tiles[][];
     private Kyra kyra;
+    private Turret turret;
     Vector3 touchPoint = new Vector3();
     Rectangle soundBounds;
 
@@ -37,7 +38,8 @@ public class Map {
                     kyra = new Kyra(this, x, pixmap.getHeight() - 1 - y);
                     kyra.state = States.SPAWN;
                 } else if (match(ENEMY, pix)) {
-
+                    turret = new Turret(this, x, pixmap.getHeight() - 1 - y);
+                    turret.state = TurretStates.STANDBY;
                 } else if (match(LEDGEL, pix) && match(TILE, tiles[x - 1][y])) {
                     tiles[x][y] = pix + 1;
                 } else {
@@ -77,4 +79,6 @@ public class Map {
     public Kyra getKyra() {
         return kyra;
     }
+
+    public Turret getTurret() {return turret; }
 }

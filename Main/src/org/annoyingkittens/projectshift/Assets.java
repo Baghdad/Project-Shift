@@ -15,6 +15,8 @@ public class Assets {
     public static TextureRegion tile;
     public static TextureRegion kyraRight;
     public static TextureRegion kyraLeft;
+    public static TextureRegion turret;
+    public static TextureRegion filter;
     /*public static Animation kyraLeftRun;
     public static Animation kyraRightRun;
     public static Animation kyraIdleLeft;
@@ -64,6 +66,9 @@ public class Assets {
         kyraRight = new TextureRegion(loadTexture("data/kyra_abs.png"));
         kyraLeft = new TextureRegion(loadTexture("data/kyra_abs.png"));
         kyraLeft.flip(true, false);
+
+        turret = new TextureRegion(loadTexture("data/turret_abs.png"));
+        filter = new TextureRegion(loadTexture("data/filter.png"));
         /*kyraRunTexture = loadTexture("data/kyra_run.png");
         kyraJumpTexture = loadTexture("data/kyra_jump.png");
         kyraFallTexture = loadTexture("data/kyra_fall.png");

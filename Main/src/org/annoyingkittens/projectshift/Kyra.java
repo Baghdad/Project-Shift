@@ -174,11 +174,13 @@ public class Kyra {
                 int px = (int) bounds.x;
                 int py = (int) (bounds.y + bounds.height);
                 int tile = tiles[px][tiles[0].length - 1 - py];
-                if (tile != Map.TILE && lastX != 0) {
-                    bounds.x = lastX + 1;
+                if (tile != Map.TILE) {
+                    if (lastX != 0) {
+                        bounds.x = lastX + 1;
+                        lastX = 0;
+                    }
                     state = States.RUN;
-                    lastX = 0;
-                } else
+                } else if (tile == Map.TILE)
                     lastX = px;
             }
             vel.x = MAX_VEL * dir;
@@ -196,11 +198,13 @@ public class Kyra {
                 int px = (int) bounds.x;
                 int py = (int) (bounds.y + bounds.height);
                 int tile = tiles[px][tiles[0].length - 1 - py];
-                if (tile != Map.TILE && lastX != 0) {
-                    bounds.x = lastX - 1;
+                if (tile != Map.TILE) {
+                    if (lastX != 0) {
+                        bounds.x = lastX + 1;
+                        lastX = 0;
+                    }
                     state = States.RUN;
-                    lastX = 0;
-                } else
+                } else if (tile == Map.TILE)
                     lastX = px;
             }
             vel.x = MAX_VEL * dir;
@@ -231,6 +235,8 @@ public class Kyra {
                     if (tile == Map.TILE) {
                         state = States.CROUCH_IDLE;
                         lastX = px;
+                    } else {
+                        state = States.IDLE;
                     }
                 } else {
                     state = States.IDLE;
