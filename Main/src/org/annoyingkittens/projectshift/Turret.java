@@ -38,7 +38,8 @@ public class Turret {
         float deltaY = 0.25f * (float) Math.sin(angle * Math.PI / 180);
         for (float x = ix, y = iy; x > 0 && y > 0 && x < map.getTiles()[0].length && y < map.getTiles().length;
              x = x + deltaX, y = y - deltaY) {
-            if (map.getTiles()[(int) Math.ceil(x)][(int) Math.ceil(y)] == Map.TILE) {
+            int tile = map.getTiles()[(int) x][(int) Math.ceil(y)];
+            if (tile == Map.TILE || tile == Map.LEDGEL || tile == Map.LEDGER) {
                 if (state == TurretStates.FIRE) {
                     state = TurretStates.STANDBY;
                 }
