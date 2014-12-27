@@ -33,16 +33,18 @@ public class Kyra {
     int lastX = 0;
     int shiftPoints = 300;
     int shiftDelay = 30;
-    int healthPoints = 100;
+    public int healthPoints = 100;
 
 
     States state = States.SPAWN;
     float stateTime = 0;
     int dir = RIGHT;
     int[][] tiles;
+    Map map;
     boolean grounded = false;
 
     public Kyra(Map map, float x, float y) {
+        this.map = map;
         tiles = map.getTiles();
         pos.x = x;
         pos.y = y;
@@ -56,7 +58,7 @@ public class Kyra {
 
     //метод, который вызывается через каждые deltaTime
     public void update(float deltaTime) {
-        Gdx.app.debug("Shift", "state " + state);
+        //Gdx.app.debug("Shift", "state " + state);
         processKeys();
         //в шифте Кира не падает
         if (state != States.SHIFT && state != States.HANG && state != States.CLIMB) {
@@ -87,6 +89,10 @@ public class Kyra {
             }
             shiftDelay++;
             shiftPoints++;
+        }
+
+        if (map.state == SecurityStates.UNDEDECTED && healthPoints < 100) {
+            healthPoints++;
         }
 
         //манипуляции при прыжке номер раз
@@ -128,7 +134,6 @@ public class Kyra {
         //приращение времени состояния
         if (state == States.SPAWN || state == States.JUMP || state == States.CLIMB) {
             stateTime += deltaTime;
-            Gdx.app.debug("Shift", "" + stateTime);
         }
         droopTime += deltaTime;
     }

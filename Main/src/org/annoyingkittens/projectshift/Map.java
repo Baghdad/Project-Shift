@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Author: Bogdanov Kirill
@@ -19,9 +20,10 @@ public class Map {
 
     private int tiles[][];
     private Kyra kyra;
-    private Turret turret;
+    private Array<Turret> turrets = new Array<Turret>();
     Vector3 touchPoint = new Vector3();
     Rectangle soundBounds;
+    SecurityStates state = SecurityStates.UNDEDECTED;
 
     public Map() {
         loadBinary();
@@ -38,8 +40,7 @@ public class Map {
                     kyra = new Kyra(this, x, pixmap.getHeight() - 1 - y);
                     kyra.state = States.SPAWN;
                 } else if (match(ENEMY, pix)) {
-                    turret = new Turret(this, x, pixmap.getHeight() - 1 - y);
-                    turret.state = TurretStates.STANDBY;
+                    turrets.add(new Turret(this, x, pixmap.getHeight() - 1 - y));
                 } else if (match(LEDGEL, pix) && match(TILE, tiles[x - 1][y])) {
                     tiles[x][y] = pix + 1;
                 } else {
@@ -53,19 +54,30 @@ public class Map {
     }
 
     public void update(float deltaTime) {
+        Gdx.app.debug("Shift", "" + state);
         if (Gdx.input.justTouched()) {
             touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             MapRenderer.cam.unproject(touchPoint);
             soundBounds = new Rectangle(MapRenderer.cam.position.x + 6, MapRenderer.cam.position.y + 4, 1, 1);
             if (OverlapTester.pointInRectangle(soundBounds, touchPoint.x, touchPoint.y)) {
-            				Assets.soundEnabled = !Assets.soundEnabled;
-            				if (Assets.soundEnabled)
-            					Assets.shiftMusic.play();
-            				else
-            					Assets.shiftMusic.pause();
-            			}
+                Assets.soundEnabled = !Assets.soundEnabled;
+                if (Assets.soundEnabled)
+                    Assets.shiftMusic.play();
+                else
+                    Assets.shiftMusic.pause();
+            }
         }
         kyra.update(deltaTime);
+        if (kyra.state != States.SHIFT) {
+            boolean danger = true;
+            for (Turret turret : turrets) {
+                turret.update(deltaTime);
+                danger &= turret.isDanger();
+            }
+            if (!danger) {
+                state = SecurityStates.UNDEDECTED;
+            }
+        }
     }
 
     public static boolean match(int src, int dst) {
@@ -80,5 +92,7 @@ public class Map {
         return kyra;
     }
 
-    public Turret getTurret() {return turret; }
+    public Array<Turret> getTurret() {
+        return turrets;
+    }
 }

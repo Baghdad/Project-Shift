@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Author: Bogdanov Kirill
@@ -19,11 +21,12 @@ import com.badlogic.gdx.math.Vector3;
 public class MapRenderer {
     int[][] tiles;
     Kyra kyra;
-    Turret turret;
+    Array<Turret> turrets;
     public static OrthographicCamera cam;
     SpriteCache cache;
     SpriteBatch batch = new SpriteBatch(5000);
     ShapeRenderer shapeRenderer = new ShapeRenderer();
+    ImmediateModeRenderer20 renderer = new ImmediateModeRenderer20(false, true, 0);
     int[][] blocks;
     FPSLogger fps = new FPSLogger();
     private final static int VIEWPORT_WIDTH = 18;
@@ -32,7 +35,7 @@ public class MapRenderer {
     public MapRenderer(Map map) {
         tiles = map.getTiles();
         kyra = map.getKyra();
-        turret = map.getTurret();
+        turrets = map.getTurret();
         cam = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         cam.position.set(kyra.getPosition().x, kyra.getPosition().y, 0);
         this.cache = new SpriteCache(tiles.length * tiles[0].length, false);
@@ -81,6 +84,7 @@ public class MapRenderer {
         cache.end();
         stateTime += deltaTime;
         batch.setProjectionMatrix(cam.combined);
+        renderLaserBeams();
         batch.begin();
         renderKyra();
         renderTurret();
@@ -161,11 +165,26 @@ public class MapRenderer {
     }
 
     private void renderTurret() {
-        batch.draw(Assets.turret, turret.pos.x, turret.pos.y, turret.bounds.width, turret.bounds.height);
+        for (Turret turret : turrets)
+            batch.draw(Assets.turret, turret.pos.x - 0.5f, turret.pos.y, turret.bounds.width, turret.bounds.height);
     }
 
     private void renderUI() {
         batch.draw(Assets.soundEnabled ? Assets.soundOn : Assets.soundOff, cam.position.x + 6, cam.position.y + 4, 1, 1);
+    }
+
+    private void renderLaserBeams() {
+        cam.update(false);
+        renderer.begin(cam.combined, GL20.GL_LINES);
+        for (Turret turret : turrets) {
+            float sx = turret.startPoint.x, sy = turret.startPoint.y;
+            float ex = turret.pointer.x, ey = turret.pointer.y;
+            renderer.color(1, 0, 0, 1);
+            renderer.vertex(sx, sy, 0);
+            renderer.color(1, 0, 0, 1);
+            renderer.vertex(ex, ey, 0);
+            renderer.end();
+        }
     }
 
     public void dispose() {
